@@ -1,58 +1,44 @@
 <?php
 session_start();
 
-// Check if user is already logged in, if so, redirect to the dashboard
-if (isset($_SESSION['user_id'])) {
-    header('Location: dashboard.php');  // Change to your dashboard page
-    exit();
-}
-
-// Include database connection
 require_once 'connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get the login credentials
-    $username = mysqli_real_escape_string($conn, $_POST['username']);
-    $password = mysqli_real_escape_string($conn, $_POST['password']);
 
-    // Basic validation (check if fields are empty)
+    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
     if (empty($username) || empty($password)) {
         $_SESSION['error'] = 'Username and Password are required.';
-        header('Location: login.php');  // Redirect back with error
+        header('Location: login.php'); 
         exit();
     }
 
-    // Query to check if user exists with the given username
-    $query = "SELECT * FROM users WHERE username = '$username' LIMIT 1";
-    $result = mysqli_query($conn, $query);
+    $checkQuery = "SELECT * FROM users WHERE username = :username";
+    $stmt = $db->prepare($checkQuery);
+    $stmt->bindValue(':username', $username);
+    $stmt->execute();
 
-    if (mysqli_num_rows($result) > 0) {
-        // User found, check password
-        $user = mysqli_fetch_assoc($result);
-        
-        // Verify the password (assuming the password is hashed)
-        if (password_verify($password, $user['password'])) {
-            // Create session variables
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = $user['role'];  // Admin, Editor, Member, etc.
+    if ($stmt->rowCount() == 0) {
+        $_SESSION['error'] = 'Username and Password Does not match';
+        header('Location: login.php');
+        exit();
+    }
 
-            // Redirect based on role
-            if ($user['role'] === 'Admin') {
-                header('Location: admin_dashboard.php');  // Admin's dashboard
-            } elseif ($user['role'] === 'Editor') {
-                header('Location: editor_dashboard.php');  // Editor's dashboard
-            } else {
-                header('Location: member_dashboard.php');  // Member's dashboard
-            }
-            exit();
-        } else {
-            $_SESSION['error'] = 'Invalid password. Please try again.';
-            header('Location: login.php');
-            exit();
-        }
-    } else {
-        $_SESSION['error'] = 'Username not found.';
+    $user = $stmt->fetch();
+
+    if(password_verify($password, $user['password'])){
+        $_SESSION['user_data'] = [
+            'username' => $user['username'],
+            'email' => $user['email'],
+            'role' => $user['role']
+        ];
+        $_SESSION['success'] = 'Login Successful';
+        header('Location: index.php');
+        exit();
+    }
+    else {
+        $_SESSION['error'] = 'Username and Password Does not match';
         header('Location: login.php');
         exit();
     }
@@ -75,6 +61,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p style="color: red;"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></p>
         <?php endif; ?>
 
+        <?php if (isset($_SESSION['success'])): ?>
+            <p style="color: green;"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></p>
+        <?php endif; ?>
+
         <form action="login.php" method="POST">
             <label for="username">Username:</label><br>
             <input type="text" id="username" name="username" required><br><br>
@@ -85,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="submit" value="Login">
         </form>
         
-        <p>Don't have an account? <a href="register.php">Register here</a></p>
+        <p>Don't have an account? <a href="registration.php">Register here</a></p>
     </div>
 </body>
 </html>

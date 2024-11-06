@@ -1,21 +1,21 @@
 <?php
-// Start the session
+
 session_start();
 
-// Include database connection
+
 require_once 'connect.php';  // Adjust path as needed
 
-// Check if the form is submitted
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Get user input
+    
     $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
     $confirm_password = filter_input(INPUT_POST, 'confirm_password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $role = 'Member';
 
-    // Basic validation
+   
     if (empty($username) || empty($password) || empty($confirm_password) || empty($email)) {
         $_SESSION['error'] = 'All fields are required!';
         header('Location: registration.php');
@@ -28,10 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    // Hash the password (you can use PASSWORD_BCRYPT for better security)
     $hashed_password = password_hash($password, PASSWORD_BCRYPT,['cost'=>12]);
 
-    // Check if username already exists
     $checkQuery = "SELECT * FROM users WHERE username = :username";
     $stmt = $db->prepare($checkQuery);
     $stmt->bindValue(':username', $username);
@@ -43,7 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    // Insert user into the database
     $insertQuery = "INSERT INTO users (username, password, role, email) VALUES (:username, :password, :role, :email)";
     $stmt = $db->prepare($insertQuery);
     $stmt->bindValue(':username', $username);
@@ -52,9 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bindValue(':email', $email);
     $stmt->execute();
 
-    // Set success message and redirect
     $_SESSION['success'] = 'Registration successful! You can now log in.';
-    header('Location: login.php');  // Redirect to login page after successful registration
+    header('Location: login.php');  
     exit();
 }
 ?>
@@ -69,7 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 
-    <!-- Display error or success message -->
     <?php if (isset($_SESSION['error'])): ?>
         <p style="color: red;"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></p>
     <?php endif; ?>
@@ -80,7 +75,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <h2>User Registration</h2>
 
-    <!-- Registration Form -->
     <form action="registration.php" method="POST">
         <label for="username">Username:</label><br>
         <input type="text" id="username" name="username" required><br><br>
