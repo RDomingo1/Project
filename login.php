@@ -15,17 +15,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $checkQuery = "SELECT * FROM users WHERE username = :username";
-    $stmt = $db->prepare($checkQuery);
-    $stmt->bindValue(':username', $username);
-    $stmt->execute();
+    $statement = $db->prepare($checkQuery);
+    $statement->bindValue(':username', $username);
+    $statement->execute();
 
-    if ($stmt->rowCount() == 0) {
+    if ($statement->rowCount() == 0) {
         $_SESSION['error'] = 'Username and Password Does not match';
         header('Location: login.php');
         exit();
     }
 
-    $user = $stmt->fetch();
+    $user = $statement->fetch();
 
     if(password_verify($password, $user['password'])){
         $_SESSION['user_data'] = [
@@ -54,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <?php include('header.php') ?>
     <div class="login-container">
         <h2>Login to Your Account</h2>
 

@@ -1,24 +1,25 @@
 <?php
-// Start the session
+
 // print_r($_POST); 
 session_start();
 
-// Include database connection
-require_once 'connect.php';  // Adjust path as needed
+
+require_once 'connect.php'; 
 require('authenticate.php');
 
-// Check if user is logged in and has the correct role
-// if (!isset($_SESSION['user_id'])) {
-//     header("Location: login.php");
-//     exit();
-// }
 
-// $user_role = $_SESSION['role'];
-// if ($user_role !== 'Admin' && $user_role !== 'Editor') {
-//     $_SESSION['error'] = 'Permission Denied: You are not authorized to create a post.';
-//     header('Location: create_post.html');  // Redirect back to the form with an error
-//     exit();
-// }
+if (!isset($_SESSION['user_data']['role'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$user_role = $_SESSION['user_data']['role'];
+print_r($user_role);
+if ($user_role != 'Admin' && $user_role != 'Editor' ) {
+    $_SESSION['error'] = 'Permission Denied: You are not authorized to create a post.';
+    header('Location: index.php'); 
+    exit();
+}
 
 if($_POST && !empty($_POST['title']) && !empty($_POST['context'])) {
 
