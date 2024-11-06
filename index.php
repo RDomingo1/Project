@@ -55,7 +55,7 @@ $posts = $statement->fetchAll(PDO::FETCH_ASSOC);
             <tr>
                 <th>Title</th>
                 <th>Date Created</th>
-                <th>Actions</th>
+                <th>Context</th>
             </tr>
         </thead>
         <tbody>
