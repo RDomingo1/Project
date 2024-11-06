@@ -1,11 +1,9 @@
 <?php
-// Start the session
+
 session_start();
 print_r($_SESSION);
 
-// // Include the database connection
-require_once 'connect.php';  // Adjust path to your database connection
-
+require_once 'connect.php';  
 
 $query = "SELECT * FROM posts ORDER BY date_created DESC";
 $statement = $db->prepare($query);

@@ -1,12 +1,9 @@
 <?php
 
-// print_r($_POST); 
+ 
 session_start();
 
-
 require_once 'connect.php'; 
-require('authenticate.php');
-
 
 if (!isset($_SESSION['user_data']['role'])) {
     header("Location: login.php");
@@ -22,16 +19,13 @@ if ($user_role != 'Admin' && $user_role != 'Editor' ) {
 }
 
 if($_POST && !empty($_POST['title']) && !empty($_POST['context'])) {
-
-
-        
+     
     $title = filter_input(INPUT_POST,'title', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $context = filter_input(INPUT_POST,'context', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     
-        // Validate form data (basic validation)
     if (empty($title) || empty($context)) {
         $_SESSION['error'] = 'Title and context are required fields.';
-        // header('Location: create_post.php');  // Redirect back to the form with an error
+        header('Location: create_post.php'); 
         exit();
     }
     $query = "INSERT INTO posts(User_id,title,context)
@@ -43,7 +37,7 @@ if($_POST && !empty($_POST['title']) && !empty($_POST['context'])) {
     $statement->bindValue(":User_id", NULL);
     $statement->execute();
 
-    //  header("Location: index.php");
+    header("Location: index.php");
 
     
 }    
@@ -60,7 +54,6 @@ if($_POST && !empty($_POST['title']) && !empty($_POST['context'])) {
 </head>
 <body>
 
-    <!-- Display error or success message -->
     <?php if (isset($_SESSION['error'])): ?>
         <p style="color: red;"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></p>
     <?php endif; ?>
@@ -71,7 +64,6 @@ if($_POST && !empty($_POST['title']) && !empty($_POST['context'])) {
 
     <h2>Create a New Post</h2>
 
-    <!-- Form to create a new post -->
     <form action="create_post.php" method="POST">
         <label for="title">Post Title:</label><br>
         <input type="text" id="title" name="title" required><br><br>
