@@ -41,7 +41,6 @@ $posts = $statement->fetchAll(PDO::FETCH_ASSOC);
             <tr>
                 <th>Title</th>
                 <th>Date Created</th>
-                <th>Context</th>
             </tr>
         </thead>
         <tbody>
@@ -49,7 +48,7 @@ $posts = $statement->fetchAll(PDO::FETCH_ASSOC);
                 <tr>
                     <td><?php echo htmlspecialchars($post['title']); ?></td>
                     <td><?php echo date("F j, Y, g:i a", strtotime($post['date_created'])); ?></td>
-                    <td><?php echo $post['context']; ?></td>
+                    <td><a href="view.php?id=<?=$post['Post_id']?>">View</a></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
