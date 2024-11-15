@@ -49,6 +49,7 @@ $posts = $statement->fetchAll(PDO::FETCH_ASSOC);
                     <td><?php echo htmlspecialchars($post['title']); ?></td>
                     <td><?php echo date("F j, Y, g:i a", strtotime($post['date_created'])); ?></td>
                     <td><a href="view.php?id=<?=$post['Post_id']?>">View</a></td>
+                    <td><a href="edit.php?id=<?=$post['Post_id']?>">Edit</a></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
