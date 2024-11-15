@@ -1,6 +1,4 @@
 <?php
-
- 
 session_start();
 
 require_once 'connect.php'; 
@@ -9,9 +7,8 @@ if (!isset($_SESSION['user_data']['role'])) {
     header("Location: login.php");
     exit();
 }
-
 $user_role = $_SESSION['user_data']['role'];
-print_r($user_role);
+// print_r($user_role);
 if ($user_role != 'Admin' && $user_role != 'Editor' ) {
     $_SESSION['error'] = 'Permission Denied: You are not authorized to create a post.';
     header('Location: index.php'); 
@@ -61,17 +58,26 @@ else{
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create New Post</title>
+    <title>Edit Post</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.tiny.cloud/1/870tdp4rg7jz4jr9r3ftapd4d3k0nwsbg805k9poqlrg1aw1/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+    <script type="text/javascript">
+        tinymce.init({
+            selector: 'textarea',
+            plugins: ['autolink', 'link', 'autoresize', 'wordcount', 'visualchars'],
+            toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify | ' +
+                     'bullist numlist outdent indent | visualchars |' +
+                     'forecolor backcolor emoticons | help | wordcount'
+        });
+    </script>
 </head>
 <body>
-
+    <?php include('header.php') ?>
     <?php if (isset($_SESSION['error'])): ?>
         <p style="color: red;"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></p>
     <?php endif; ?>

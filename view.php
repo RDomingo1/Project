@@ -39,7 +39,7 @@ if(empty($post)) {
 
     <h2><?=$post['title']?></h2>
         <p>Created On <?=date("F j, Y, g:i a", strtotime($post['date_created']))?></p>
-        <p><?= $post['context']?></p>
+        <p><?= htmlspecialchars_decode($post['context']) ?></p>
         <p><a href="edit.php?id=<?=$post['Post_id']?>">Edit</a></p>
 </body>
 </html>

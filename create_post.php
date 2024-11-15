@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_data']['role'])) {
 }
 
 $user_role = $_SESSION['user_data']['role'];
-print_r($user_role);
+// print_r($user_role);
 if ($user_role != 'Admin' && $user_role != 'Editor' ) {
     $_SESSION['error'] = 'Permission Denied: You are not authorized to create a post.';
     header('Location: index.php'); 
@@ -51,6 +51,16 @@ if($_POST && !empty($_POST['title']) && !empty($_POST['context'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create New Post</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.tiny.cloud/1/870tdp4rg7jz4jr9r3ftapd4d3k0nwsbg805k9poqlrg1aw1/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+    <script type="text/javascript">
+        tinymce.init({
+            selector: 'textarea',
+            plugins: ['autolink', 'link', 'autoresize', 'wordcount', 'visualchars'],
+            toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify | ' +
+                     'bullist numlist outdent indent | visualchars |' +
+                     'forecolor backcolor emoticons | help | wordcount'
+        });
+    </script>
 </head>
 <body>
 
@@ -67,10 +77,8 @@ if($_POST && !empty($_POST['title']) && !empty($_POST['context'])) {
     <form action="create_post.php" method="POST">
         <label for="title">Post Title:</label><br>
         <input type="text" id="title" name="title" required><br><br>
-
         <label for="context">Content:</label><br>
-        <textarea id="context" name="context" rows="10" cols="30" required></textarea><br><br>
-
+        <textarea id="context" name="context" rows="10" cols="30" ></textarea><br><br>
         <input type="submit" value="Create Post">
     </form>
 
