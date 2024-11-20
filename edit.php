@@ -13,7 +13,7 @@ if (!isset($_SESSION['user_data']['role'])) {
     exit();
 }
 $user_role = $_SESSION['user_data']['role'];
-// print_r($user_role);
+// print_r($_FILES);
 if ($user_role != 'Admin' && $user_role != 'Editor' ) {
     $_SESSION['error'] = 'Permission Denied: You are not authorized to create a post.';
     header('Location: index.php'); 
@@ -34,12 +34,16 @@ elseif($_POST && !empty($_POST['id']) && !empty($_POST['command'])) {
     if($command == "edit"){
         $title = filter_input(INPUT_POST,'title', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $context = filter_input(INPUT_POST,'context', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $remove_image = filter_input(INPUT_POST,'remove_image', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
-        if(isset($_FILES['image'])){
-            $file_upload = "uploads/" . basename($_FILES['image']['name']);
+        if(isset($_FILES['image']) && $_FILES['image']['error'] == 0){
+            $image_extension = "." . pathinfo(basename($_FILES['image']['name']), PATHINFO_EXTENSION);
+            $image_name = basename($_FILES['image']['name'], $image_extension) . time() . $image_extension;
+            $file_upload = "uploads/" . $image_name;
             $valid_types = ['jpg','jpeg','png','gif'];
             $valid_mime_types = ['image/jpg','image/jpeg','image/png','image/gif'];  
             $actual_mime_types = mime_content_type($_FILES['image']['tmp_name']);
+            
     
             if (in_array($actual_mime_types, $valid_mime_types)) {
                 $medium = new ImageResize($_FILES['image']['tmp_name']);
@@ -68,17 +72,49 @@ elseif($_POST && !empty($_POST['id']) && !empty($_POST['command'])) {
             header('Location: edit.php?id=' + $id); 
             exit();
         }
-        $query = "UPDATE posts SET User_id = :User_id, title = :title, context = :context, image_path = :image_path  WHERE Post_id = :Post_id";
+        if($remove_image == "on"){
+            $query = "SELECT image_path FROM posts WHERE Post_id = :id";
+            $statement = $db->prepare($query);
+            $statement->bindValue(":id", $id);
+            $statement->execute();
+            $old_image = $statement->fetch()["image_path"];
+            if(!empty($old_image)){
+                unlink(realpath($old_image));
+            }
+            $query = "UPDATE posts SET image_path = NULL WHERE Post_id = :id";
+            $statement = $db->prepare($query);
+            $statement->bindValue(":id", $id);
+            $statement->execute();
+        }
+
+        $query = "";
+        if($file_upload != ""){
+            $query = "UPDATE posts SET User_id = :User_id, title = :title, context = :context, image_path = :image_path  WHERE Post_id = :Post_id";
+        }
+        else{
+            $query = "UPDATE posts SET User_id = :User_id, title = :title, context = :context WHERE Post_id = :Post_id";
+        }
+        
     
         $statement = $db->prepare($query);
         $statement->bindValue(":title", $title);
         $statement->bindValue(":Post_id", $id);
         $statement->bindValue(":context", $context);
         $statement->bindValue(":User_id", NULL);
-        $statement->bindValue(":image_path", $file_upload);
+        if($file_upload !=""){
+            $statement->bindValue(":image_path", $file_upload);
+        }
         $statement->execute();
     }
     elseif($command == "delete"){
+        $query = "SELECT image_path FROM posts WHERE Post_id = :id";
+        $statement = $db->prepare($query);
+        $statement->bindValue(":id", $id);
+        $statement->execute();
+        $old_image = $statement->fetch()["image_path"];
+        if(!empty($old_image)){
+            unlink(realpath($old_image));
+        }
         $query = "DELETE FROM posts WHERE Post_id=:id";
         $statement = $db->prepare($query);
         $statement->bindValue(":id", $id);
@@ -131,6 +167,8 @@ else{
         <textarea id="context" name="context" rows="10" cols="30" required><?=$post["context"] ?></textarea><br><br>
         <input type="hidden" name="id" value="<?=$post["Post_id"] ?>">
         <input type="file" name="image" id="img">
+        <label for="check">Delete Image?:</label>
+        <input type="checkbox" name="remove_image" id="check">
         <button type="submit" value="edit" name="command">Edit Post</button>
         <button type="submit" value="delete" name="command">Delete Post </button>
     </form>

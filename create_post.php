@@ -27,7 +27,9 @@ if($_POST && !empty($_POST['title']) && !empty($_POST['context'])) {
     $context = filter_input(INPUT_POST,'context', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     
     if(isset($_FILES['image'])){
-        $file_upload = "uploads/" . basename($_FILES['image']['name']);
+        $image_extension = "." . pathinfo(basename($_FILES['image']['name']), PATHINFO_EXTENSION);
+        $image_name = basename($_FILES['image']['name'], $image_extension) . time() . $image_extension;
+        $file_upload = "uploads/" . $image_name;
         $valid_types = ['jpg','jpeg','png','gif'];
         $valid_mime_types = ['image/jpg','image/jpeg','image/png','image/gif'];  
         $actual_mime_types = mime_content_type($_FILES['image']['tmp_name']);
