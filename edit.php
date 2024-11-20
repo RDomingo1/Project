@@ -1,7 +1,12 @@
 <?php
+
+use Gumlet\ImageResize;
 session_start();
 
 require_once 'connect.php'; 
+require("vendor\autoload.php");
+
+$file_upload = "";
 
 if (!isset($_SESSION['user_data']['role'])) {
     header("Location: login.php");
@@ -29,18 +34,48 @@ elseif($_POST && !empty($_POST['id']) && !empty($_POST['command'])) {
     if($command == "edit"){
         $title = filter_input(INPUT_POST,'title', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $context = filter_input(INPUT_POST,'context', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
+        if(isset($_FILES['image'])){
+            $file_upload = "uploads/" . basename($_FILES['image']['name']);
+            $valid_types = ['jpg','jpeg','png','gif'];
+            $valid_mime_types = ['image/jpg','image/jpeg','image/png','image/gif'];  
+            $actual_mime_types = mime_content_type($_FILES['image']['tmp_name']);
+    
+            if (in_array($actual_mime_types, $valid_mime_types)) {
+                $medium = new ImageResize($_FILES['image']['tmp_name']);
+                $medium->resizeToWidth(400);
+                $medium->save($file_upload);
+                $query = "SELECT image_path FROM posts WHERE Post_id = :id";
+
+                $statement = $db->prepare($query);
+                $statement->bindValue(":id", $id);
+                $statement->execute();
+
+                $old_image = $statement->fetch()["image_path"];
+                if(!empty($old_image)){
+                    unlink(realpath($old_image));
+                }
+
+            } else {
+                $file_upload = "";
+            }
+        } else {
+            $file_upload = ""; 
+        }
+
         if (empty($title) || empty($context)) {
             $_SESSION['error'] = 'Title and context are required fields.';
             header('Location: edit.php?id=' + $id); 
             exit();
         }
-        $query = "UPDATE posts SET User_id = :User_id, title = :title, context = :context WHERE Post_id = :Post_id";
+        $query = "UPDATE posts SET User_id = :User_id, title = :title, context = :context, image_path = :image_path  WHERE Post_id = :Post_id";
     
         $statement = $db->prepare($query);
         $statement->bindValue(":title", $title);
         $statement->bindValue(":Post_id", $id);
         $statement->bindValue(":context", $context);
         $statement->bindValue(":User_id", NULL);
+        $statement->bindValue(":image_path", $file_upload);
         $statement->execute();
     }
     elseif($command == "delete"){
@@ -88,13 +123,14 @@ else{
 
     <h2>Edit Post</h2>
 
-    <form action="edit.php" method="POST">
+    <form action="edit.php" method="POST" enctype="multipart/form-data">
         <label for="title">Post Title:</label><br>
         <input type="text" value="<?=$post["title"] ?>" id="title" name="title" required><br><br>
 
         <label for="context">Content:</label><br>
         <textarea id="context" name="context" rows="10" cols="30" required><?=$post["context"] ?></textarea><br><br>
         <input type="hidden" name="id" value="<?=$post["Post_id"] ?>">
+        <input type="file" name="image" id="img">
         <button type="submit" value="edit" name="command">Edit Post</button>
         <button type="submit" value="delete" name="command">Delete Post </button>
     </form>
