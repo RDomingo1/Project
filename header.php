@@ -9,6 +9,13 @@
             <?php endif?>
             <li><a href="index.php">Index</a></li>
         </ul>
+        <form action="index.php" method="POST">
+            <label for="title">Search</label><br>
+            <input type="text" id="search" name="search" required><br><br>
+            <input type="submit" id="search" name="submit" required>
+        </form>
     </nav>
+
+
 
     

@@ -5,10 +5,22 @@ print_r($_SESSION);
 
 require_once 'connect.php';  
 
-$query = "SELECT * FROM posts ORDER BY date_created DESC";
-$statement = $db->prepare($query);
-$statement->execute();
-$posts = $statement->fetchAll(PDO::FETCH_ASSOC);
+$searchBar = filter_input(INPUT_POST, "search", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+if($searchBar == NULL){
+    $query = "SELECT * FROM posts ORDER BY date_created DESC";
+    $statement = $db->prepare($query);
+    $statement->execute();
+    $posts = $statement->fetchAll(PDO::FETCH_ASSOC);
+}
+else{
+    $query = "SELECT * FROM posts WHERE title LIKE :search ORDER BY date_created DESC"; 
+    $statement = $db->prepare($query);
+    $statement->bindValue(":search", "%" . $searchBar . "%");
+    $statement->execute();
+    $posts = $statement->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
 
 ?>
 
