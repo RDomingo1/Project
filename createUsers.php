@@ -5,6 +5,17 @@ session_start();
 
 require_once 'connect.php'; 
 
+if (!isset($_SESSION['user_data']['role'])) {
+    header("Location: login.php");
+    exit();
+}
+$user_role = $_SESSION['user_data']['role'];
+
+if ($user_role != 'Admin' && $user_role != 'Editor' ) {
+    $_SESSION['error'] = 'Permission Denied: You are not authorized to create a user.';
+    header('Location: index.php'); 
+    exit();
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 

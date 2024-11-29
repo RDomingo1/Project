@@ -12,7 +12,7 @@ if (!isset($_SESSION['user_data']['role'])) {
 $user_role = $_SESSION['user_data']['role'];
 
 if ($user_role != 'Admin' && $user_role != 'Editor' ) {
-    $_SESSION['error'] = 'Permission Denied: You are not authorized to create a post.';
+    $_SESSION['error'] = 'Permission Denied: You are not authorized to view.';
     header('Location: index.php'); 
     exit();
 }
