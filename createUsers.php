@@ -13,18 +13,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
     $confirm_password = filter_input(INPUT_POST, 'confirm_password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $role = 'Member';
+    $role = filter_input(INPUT_POST, 'role', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
    
     if (empty($username) || empty($password) || empty($confirm_password) || empty($email)) {
         $_SESSION['error'] = 'All fields are required!';
-        header('Location: registration.php');
+        header('Location: createUsers.php');
         exit();
     }
 
     if ($password !== $confirm_password) {
         $_SESSION['error'] = 'Password Does Not Match';
-        header('Location: registration.php');
+        header('Location: createUsers.php');
         exit();
     }
 
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if ($statement->rowCount() > 0) {
         $_SESSION['error'] = 'Username already exists!';
-        header('Location: registration.php');
+        header('Location: createUsers.php');
         exit();
     }
 
@@ -49,8 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $statement->bindValue(':email', $email);
     $statement->execute();
 
-    $_SESSION['success'] = 'Registration successful! You can now log in.';
-    header('Location: login.php');  
+    $_SESSION['success'] = 'User Creation successful!';
+    header('Location: Users.php');  
     exit();
 }
 ?>
@@ -73,9 +73,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p style="color: green;"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></p>
     <?php endif; ?>
 
-    <h2>User Registration</h2>
+    <h2>User Creation</h2>
 
-    <form action="registration.php" method="POST">
+    <form action="createUsers.php" method="POST">
         <label for="username">Username:</label><br>
         <input type="text" id="username" name="username" required><br><br>
 
@@ -88,10 +88,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label for="email">Email:</label><br>
         <input type="email" id="email" name="email" required><br><br>
 
+        <label for="role">Choose a role for user:</label>
+        <select name="role" id="role">
+        <option value="Admin">Admin</option>
+        <option value="Editor">Editor</option>
+        <option value="Member">Member</option>
+        </select>
+
         <input type="submit" value="Register">
     </form>
-
-    <p>Already have an account? <a href="login.php">Log in here</a>.</p>
 
 </body>
 </html>
