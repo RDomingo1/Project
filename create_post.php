@@ -26,7 +26,7 @@ if($_POST && !empty($_POST['title']) && !empty($_POST['context'])) {
     $title = filter_input(INPUT_POST,'title', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $context = filter_input(INPUT_POST,'context', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     
-    if(isset($_FILES['image'])){
+    if(isset($_FILES['image']) && $_FILES['image']['error'] == 0){
         $image_extension = "." . pathinfo(basename($_FILES['image']['name']), PATHINFO_EXTENSION);
         $image_name = basename($_FILES['image']['name'], $image_extension) . time() . $image_extension;
         $file_upload = "uploads/" . $image_name;
