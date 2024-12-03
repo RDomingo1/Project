@@ -1,5 +1,6 @@
 {
     "require": {
-        "gumlet/php-image-resize" : "2.0.*"
+        "gumlet/php-image-resize" : "2.0.*",
+        "mobicms/captcha" : "3.1.*"
     }
 }
