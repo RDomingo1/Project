@@ -170,7 +170,7 @@ else{
         <label for="check">Delete Image?:</label>
         <input type="checkbox" name="remove_image" id="check">
         <button type="submit" value="edit" name="command">Edit Post</button>
-        <button type="submit" value="delete" name="command">Delete Post </button>
+        <button type="submit" value="delete" name="command" onclick="return confirm('Do you really want to delete this post?')">Delete Post </button>
     </form>
 
 </body>

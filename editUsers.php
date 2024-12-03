@@ -125,7 +125,7 @@ else{
         </select>
 
         <button type="submit" value="edit" name="command">Edit User</button>
-        <button type="submit" value="delete" name="command">Delete User</button>
+        <button type="submit" value="delete" name="command" onclick="return confirm('Do you really want to delete this user?')">Delete User</button>
     </form>
 
 </body>
