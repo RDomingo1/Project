@@ -31,7 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['user_data'] = [
             'username' => $user['username'],
             'email' => $user['email'],
-            'role' => $user['role']
+            'role' => $user['role'],
+            'User_id' => $user['User_id']
         ];
         $_SESSION['success'] = 'Login Successful';
         header('Location: index.php');

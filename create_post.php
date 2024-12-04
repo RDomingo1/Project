@@ -45,9 +45,6 @@ if($_POST && !empty($_POST['title']) && !empty($_POST['context'])) {
         $file_upload = ""; 
     }
 
-
-
-
     if(empty($title) || empty($context)) {
         $_SESSION['error'] = 'Title and context are required fields.';
         header('Location: create_post.php'); 
